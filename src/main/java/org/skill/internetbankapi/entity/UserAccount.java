@@ -1,10 +1,7 @@
 package org.skill.internetbankapi.entity;
 
-
 import lombok.Data;
-
 import javax.persistence.*;
-
 
 @Data
 @Entity

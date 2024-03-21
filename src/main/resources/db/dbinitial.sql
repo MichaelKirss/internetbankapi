@@ -19,11 +19,13 @@ INSERT INTO type_operations (api_method,METHOD_NAME)
 			('transferMoney', 'Перевод другому');			
 
 CREATE TABLE operations (
-	id serial primary key NOT NULL,
-	data_oper date NOT NULL,
-	user_acc int4 NOT NULL,
-	type_operation int4 NOT NULL,
-	sum numeric(16, 2),
+	ID SERIAL primary key NOT NULL,
+	DATA_OPER date NOT NULL,
+	USER_ACC int4 NOT NULL,
+	TYPE_OPERATION int4 NOT NULL,
+	STATUS_OPERATION  int4 NOT NULL,
+	SUM_OPERATION numeric(16, 2),
+	API_METHOD VARCHAR NOT NULL,
 	FOREIGN key (user_acc) references user_account(id),
 	FOREIGN key (type_operation) references type_operations(id) 
 );

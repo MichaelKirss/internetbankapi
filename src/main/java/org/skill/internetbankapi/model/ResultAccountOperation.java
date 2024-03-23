@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Data
-public class ResultAccontOperation {
+public class ResultAccountOperation {
     @SerializedName("Value")
     private String value;
     @SerializedName("Comment")

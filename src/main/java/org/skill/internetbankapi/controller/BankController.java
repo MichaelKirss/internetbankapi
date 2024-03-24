@@ -1,6 +1,5 @@
 package org.skill.internetbankapi.controller;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.skill.internetbankapi.model.ResultAccountOperation;
@@ -13,17 +12,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-
-import static org.skill.internetbankapi.config.AccountsConfiguration.GET_OPERATION_LIST;
 import static org.skill.internetbankapi.config.NameError.INPUT_DATE_NOT_VALID;
 import static org.skill.internetbankapi.model.JsonUtil.serialToJs;
 
 @Data
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "Bank API Controller",
-     description = "API для работы со счетами и операциями"
-)
 public class BankController {
     private final OperationService operationService;
     private List<ResultAccountOperation> resultAccountOperationList;

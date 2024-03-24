@@ -45,26 +45,24 @@ public class OperationService {
                     .getFirst();
 
         } catch (NoSuchElementException e) {
-            result.setValue("-1");
-            result.setComment(ACCOUNT_NOT_FOUND);
-            resultAccountOperationList.addLast(result);
-            resultFinal.setBalance((ArrayList<ResultAccountOperation>) resultAccountOperationList);
         }
         switch (financeOperation.getOperationType()) {
             case GET_BALANCE:
-                resulFinanceOperationToZero();
                 try {
                     float bal = userAccount.getBalance();
                     result.setValue(String.format("%.2f", bal));
                     result.setComment("");
                     saveOrUpdateOperation(userAccount, null);
-                    resultAccountOperationList.addLast(result);
-                    resultFinal.setBalance((ArrayList<ResultAccountOperation>) resultAccountOperationList);
                 } catch (NullPointerException e) {
+                    result.setValue("-1");
+                    result.setComment(ACCOUNT_NOT_FOUND);
                 }
+                resulFinanceOperationToZero();
+                resultAccountOperationList.addLast(result);
+                resultFinal.setBalance((ArrayList<ResultAccountOperation>) resultAccountOperationList);
+
                 break;
             case TAKE_MONEY:
-                resulFinanceOperationToZero();
                 try {
                     float bal = userAccount.getBalance();
                     bal = bal - Float.parseFloat(financeOperation.getSum());
@@ -84,12 +82,14 @@ public class OperationService {
                         }
                     }
                 } catch (NullPointerException e) {
+                    result.setValue("-1");
+                    result.setComment(ACCOUNT_NOT_FOUND);
                 }
+                resulFinanceOperationToZero();
                 resultAccountOperationList.addLast(result);
                 resultFinal.setTakeMoney((ArrayList<ResultAccountOperation>) resultAccountOperationList);
                 break;
             case PUT_MONEY:
-                resulFinanceOperationToZero();
                 try {
                     if (Integer.parseInt(financeOperation.getSum()) <= 0) {
                         result.setComment(DEPOSIT_ZERO);
@@ -105,13 +105,12 @@ public class OperationService {
                 } catch (NullPointerException e) {
                     result.setValue("-1");
                     result.setComment(ACCOUNT_NOT_FOUND);
-                    resultAccountOperationList.addLast(result);
                 }
+                resulFinanceOperationToZero();
                 resultAccountOperationList.addLast(result);
                 resultFinal.setPutMoney((ArrayList<ResultAccountOperation>) resultAccountOperationList);
                 break;
             case TRANSFER_MONEY:
-                resulFinanceOperationToZero();
                 try {
                     UserAccount userAccountReceiver = userAccountRepository.findAll()
                             .stream()
@@ -148,12 +147,15 @@ public class OperationService {
                             }
                         }
                     } catch (NullPointerException e) {
+                        result.setValue("-1");
+                        result.setComment(ACCOUNT_NOT_FOUND);
                     }
                 } catch (NoSuchElementException e) {
-                    resulFinanceOperationToZero();
                     result.setValue("-1");
                     result.setComment(ACCOUNT_RECEIVER_NOT_FOUND);
+
                 }
+                resulFinanceOperationToZero();
                 resultAccountOperationList.addLast(result);
                 resultFinal.setTransferMoney((ArrayList<ResultAccountOperation>) resultAccountOperationList);
                 break;
@@ -197,7 +199,6 @@ public class OperationService {
                                 operations.getTypeOperation(),
                                 String.format("%.2f", recSum)));
                     }
-
                 }
                 resultFinal.setResultReportOperationList((ArrayList<ResultReportOperation>) resultReportOperationList);
                 break;

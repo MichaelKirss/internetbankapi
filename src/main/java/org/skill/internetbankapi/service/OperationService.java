@@ -165,6 +165,8 @@ public class OperationService {
                 List<ResultReportOperation> resultReportOperationList = new ArrayList<>();
                 Date startDate = null;
                 Date finishDate = null;
+                String dateOper = "";
+                float sumRes = 0F;
                 if (financeOperation.getStartDate() == null) {
                     startDate = new SimpleDateFormat("dd-MM-yyyy").parse(BEGIN_START_DATE);
                 } else {
@@ -177,28 +179,35 @@ public class OperationService {
                 }
                 for (Operations operations : operationsList) {
                     Date operationDate = operations.getDataOper();
-                    String dateOper = new SimpleDateFormat("dd-MM-yyyy").format(operations.getDataOper());
-                    if (Long.valueOf(operations.getUserAcc()) == Long.valueOf(financeOperation.getUserId())) {
+                    dateOper = new SimpleDateFormat("dd-MM-yyyy").format(operations.getDataOper());
+                    if (Long.valueOf(operations.getUserAcc()) == Long.valueOf(financeOperation.getUserId()) ||
+                            (Long.valueOf(operations.getUserAccRec()) == Long.valueOf(financeOperation.getUserId()))) {
                         if (startDate.before(operations.getDataOper()) &&
                                 finishDate.after(operations.getDataOper())
                         ) {
+                            if ((Long.valueOf(operations.getUserAccRec())) == Long.valueOf(financeOperation.getUserId())) {
+                                sumRes = -operations.getSumOperation();
+                            }else {
+                                sumRes = operations.getSumOperation();
+                            }
                             resultReportOperationList.addLast(new ResultReportOperation(
                                     dateOper,
                                     operations.getTypeOperation(),
-                                    String.format("%.2f", operations.getSumOperation())));
+                                    String.format("%.2f", sumRes)));
                         } else if (startDate.equals(operations.getDataOper()) ||
-                                finishDate.equals(operations.getDataOper()))
+                                finishDate.equals(operations.getDataOper())) {
+                            if ((Long.valueOf(operations.getUserAccRec()) == Long.valueOf(financeOperation.getUserId()))) {
+                                sumRes = -operations.getSumOperation();
+                            }else {
+                                sumRes = operations.getSumOperation();
+                            }
                             resultReportOperationList.addLast(new ResultReportOperation(
                                     dateOper,
                                     operations.getTypeOperation(),
-                                    String.format("%.2f", operations.getSumOperation())));
-                    } else if (Long.valueOf(operations.getUserAccRec()) == Long.valueOf(financeOperation.getUserId())) {
-                        Float recSum = Float.valueOf(financeOperation.getSum());
-                        resultReportOperationList.addLast(new ResultReportOperation(
-                                dateOper,
-                                operations.getTypeOperation(),
-                                String.format("%.2f", recSum)));
+                                    String.format("%.2f", sumRes)));
+                        }
                     }
+
                 }
                 resultFinal.setResultReportOperationList((ArrayList<ResultReportOperation>) resultReportOperationList);
                 break;

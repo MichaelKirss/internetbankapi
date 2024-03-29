@@ -12,7 +12,7 @@ public class FinanceOperation {
     private Date dateOperation;
     private String operationType;
     private Long userId;
-    private String sum;
+    private float sum;
     private Date startDate;
     private Date finishDate;
     private Long userIdReceiver;

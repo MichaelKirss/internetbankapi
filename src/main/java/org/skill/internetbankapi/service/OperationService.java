@@ -52,7 +52,6 @@ public class OperationService {
                     float bal = userAccount.getBalance();
                     result.setValue(String.format("%.2f", bal));
                     result.setComment("");
-                    saveOrUpdateOperation(userAccount, null);
                 } catch (NullPointerException e) {
                     result.setValue("-1");
                     result.setComment(ACCOUNT_NOT_FOUND);
@@ -65,13 +64,13 @@ public class OperationService {
             case TAKE_MONEY:
                 try {
                     float bal = userAccount.getBalance();
-                    bal = bal - Float.parseFloat(financeOperation.getSum());
+                    bal = bal - financeOperation.getSum();
                     if (bal < 0) {
                         result.setComment(INSUFFICIENT_FUNDS);
                         result.setValue("0");
                         bal = userAccount.getBalance();
                     } else {
-                        if (Integer.parseInt(financeOperation.getSum()) <= 0) {
+                        if (financeOperation.getSum() <= 0) {
                             result.setComment(WITHDRAWALS_ZERO);
                             result.setValue("0");
                         } else {
@@ -91,12 +90,12 @@ public class OperationService {
                 break;
             case PUT_MONEY:
                 try {
-                    if (Integer.parseInt(financeOperation.getSum()) <= 0) {
+                    if (financeOperation.getSum() <= 0) {
                         result.setComment(DEPOSIT_ZERO);
                         result.setValue("0");
                     } else {
                         float bal = userAccount.getBalance();
-                        bal = bal + Float.parseFloat(financeOperation.getSum());
+                        bal = bal + financeOperation.getSum();
                         userAccount.setBalance(bal);
                         result.setValue("1");
                         result.setComment("");
@@ -121,14 +120,14 @@ public class OperationService {
                             .getFirst();
                     try {
                         float bal = userAccount.getBalance();
-                        bal = bal - Float.parseFloat(financeOperation.getSum());
+                        bal = bal - financeOperation.getSum();
                         if (bal < 0) {
                             result.setComment(INSUFFICIENT_FUNDS);
                             result.setValue("0");
                             bal = userAccount.getBalance();
 
                         } else {
-                            if (Integer.parseInt(financeOperation.getSum()) <= 0) {
+                            if (financeOperation.getSum() <= 0) {
                                 result.setComment(WITHDRAWALS_ZERO);
                                 result.setValue("0");
 
@@ -139,7 +138,7 @@ public class OperationService {
                             }
                             if (result.getValue() == "1") {
                                 float bal1 = userAccountReceiver.getBalance();
-                                bal1 = bal1 + Float.parseFloat(financeOperation.getSum());
+                                bal1 = bal1 + financeOperation.getSum();
                                 userAccountReceiver.setBalance(bal1);
                                 result.setValue("1");
                                 result.setComment("");
@@ -166,7 +165,7 @@ public class OperationService {
                 Date startDate = null;
                 Date finishDate = null;
                 String dateOper = "";
-                float sumRes = 0F;
+                float sumRes;
                 if (financeOperation.getStartDate() == null) {
                     startDate = new SimpleDateFormat("dd-MM-yyyy").parse(BEGIN_START_DATE);
                 } else {
@@ -187,7 +186,7 @@ public class OperationService {
                         ) {
                             if ((Long.valueOf(operations.getUserAccRec())) == Long.valueOf(financeOperation.getUserId())) {
                                 sumRes = -operations.getSumOperation();
-                            }else {
+                            } else {
                                 sumRes = operations.getSumOperation();
                             }
                             resultReportOperationList.addLast(new ResultReportOperation(
@@ -198,7 +197,7 @@ public class OperationService {
                                 finishDate.equals(operations.getDataOper())) {
                             if ((Long.valueOf(operations.getUserAccRec()) == Long.valueOf(financeOperation.getUserId()))) {
                                 sumRes = -operations.getSumOperation();
-                            }else {
+                            } else {
                                 sumRes = operations.getSumOperation();
                             }
                             resultReportOperationList.addLast(new ResultReportOperation(
@@ -207,7 +206,6 @@ public class OperationService {
                                     String.format("%.2f", sumRes)));
                         }
                     }
-
                 }
                 resultFinal.setResultReportOperationList((ArrayList<ResultReportOperation>) resultReportOperationList);
                 break;
@@ -243,7 +241,7 @@ public class OperationService {
             case TAKE_MONEY:
                 operationItem.setStatusOperation(Integer.parseInt(result.getValue()));
                 operationItem.setComment(result.getComment());
-                Float debit = Float.valueOf(Float.parseFloat(financeOperation.getSum())) * (-1F);
+                Float debit = -financeOperation.getSum();
                 operationItem.setSumOperation(debit);
                 operationsRepository.save(operationItem);
                 userAccountRepository.save(userAccount);
@@ -251,14 +249,14 @@ public class OperationService {
             case PUT_MONEY:
                 operationItem.setStatusOperation(Integer.parseInt(result.getValue()));
                 operationItem.setComment(result.getComment());
-                operationItem.setSumOperation(Float.parseFloat(financeOperation.getSum()));
+                operationItem.setSumOperation(financeOperation.getSum());
                 operationsRepository.save(operationItem);
                 userAccountRepository.save(userAccount);
                 break;
             case TRANSFER_MONEY:
                 operationItem.setStatusOperation(Integer.parseInt(result.getValue()));
                 operationItem.setComment(result.getComment());
-                debit = Float.valueOf(Float.parseFloat(financeOperation.getSum())) * (-1F);
+                debit = -financeOperation.getSum();
                 operationItem.setSumOperation(debit);
                 operationItem.setUserAccRec(financeOperation.getUserIdReceiver());
                 operationsRepository.save(operationItem);
@@ -276,4 +274,3 @@ public class OperationService {
         resultFinal.setResultReportOperationList(null);
     }
 }
-

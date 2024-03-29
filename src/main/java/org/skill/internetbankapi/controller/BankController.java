@@ -2,6 +2,7 @@ package org.skill.internetbankapi.controller;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.connector.Response;
 import org.skill.internetbankapi.model.ResultAccountOperation;
 import org.skill.internetbankapi.model.ResultFinal;
 import org.skill.internetbankapi.service.FinanceOperation;
@@ -26,17 +27,21 @@ public class BankController {
     private ResultFinal resultFinal;
 
 
-    @GetMapping("/api")
-    public String getRequest(@RequestParam(name = "operation") String operation,
+    @GetMapping("/api/{operation}")
+    public String getRequest(@PathVariable String operation,
                              @RequestParam(name = "userid") String userAcc,
                              @RequestParam(name = "sum", required = false) String sum,
                              @RequestParam(name = "useridrec", required = false) String accReceiver,
                              @RequestParam(name = "startdate", required = false) String startDate,
                              @RequestParam(name = "finishdate", required = false) String finishDate
     ) throws ParseException {
+        float sumFloat;
         financeOperation.setOperationType(operation);
         financeOperation.setUserId(Long.parseLong(userAcc));
-        financeOperation.setSum(sum);
+        if (sum !=null) {
+            sumFloat = Float.valueOf(Float.parseFloat(sum));
+            financeOperation.setSum(sumFloat / 100);
+        }
         if (accReceiver != null) financeOperation.setUserIdReceiver(Long.parseLong(accReceiver));
         try {
             if (startDate != null)

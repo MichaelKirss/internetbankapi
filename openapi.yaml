@@ -1,0 +1,313 @@
+openapi: 3.1.0 
+info:
+  version: 1.0.0
+  title: API для Интернет-банка
+  description: >-
+    # Общая информация
+    
+    Это API будет использовать банкомат, веб-приложение или мобильное приложение Интернет-банк
+
+    Будут доступны следующие операции
+      * Узнать баланс по ID пользователя
+      * Снятие заданной суммы с баланса пользователя
+      * Пополнение баланса на заданную сумму
+      * Перевести заданную сумму другому пользователю
+      * Отобразить список операций за выбранный период
+      
+    ## Начальные настройки
+    
+    Для работы приложения создаем базу данных счетов пользователей с предварительными остатками. Используемая база данных PostgresSQL.
+    Код проекта https://github.com/MichaelKirss/internetbankapi
+    Иинициализация базы данных счетов /resources/db/dbinitial.sql
+    
+    ## Использование данных в запросе
+    
+    Значения типов операций должны точно совпадать с типом метода. Значения сумм в запросе приводятся в минимальной единице валюты
+    Например для единицы рубли РФ это сумма в копейках
+    
+
+servers:
+  - url: 'https://michael-test.venetsbank.ru:8443'
+  - url: 'http://michael-test.venetsbank.ru:8081'
+    
+tags:
+  - name: getBalance
+    description: Узнать баланс по ID пользователя
+  - name: takeMoney
+    description: Снятие заданной суммы с баланса пользователя
+  - name: putMoney
+    description: Пополнение баланса на заданную сумму
+  - name: transferMoney
+    description: Перевести заданную сумму другому пользователю
+  - name: getOperationList
+    description: Отобразить список операций за выбранный период
+x-tagGroups:
+  - name: Базовые функции API
+    tags:
+      - getBalance
+      - takeMoney
+      - putMoney
+      - transferMoney
+      - getOperationList
+paths:
+  /getBalance:
+    get:
+      operationId: getBalance
+      description: >-
+        Узнать баланс по ID пользователя
+      tags:
+        - getBalance
+      parameters:
+        - in: query
+          name: userid
+          description: ID Пользователя
+          required: true
+          example: 'userid=15'
+          schema:
+            type: string
+      responses:
+        200:
+          description: Успешное выполнение
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balance'
+        400:
+          description: Некорректные параметры запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorParameter'
+  /takeMoney:              
+    get:
+      operationId: takeMoney
+      description: >-
+        Снятие заданной суммы с баланса пользователя
+      tags:
+        - takeMoney
+      parameters:
+        - in: query
+          name: userid
+          description: ID Пользователя
+          required: true
+          example: 'userid=15'
+          schema:
+            type: string  
+        - in: query
+          name: sum
+          description: Сумма операции в минимальных единицах валюты
+          required: true
+          example: 'sum=12300'
+          schema:
+            type: string
+      responses:
+        200:
+          description: Успешное выполнение
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TakeMoney'
+        400:
+          description: Некорректные параметры запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorParameter'
+  /putMoney:              
+    get:
+      operationId: putMoney
+      description: >-
+        Снятие заданной суммы с баланса пользователя
+      tags:
+        - putMoney
+      parameters:
+        - in: query
+          name: userid
+          description: ID Пользователя
+          required: true
+          example: 'userid=15'
+          schema:
+            type: string  
+        - in: query
+          name: sum
+          description: Сумма операции в минимальных единицах валюты
+          required: true
+          example: 'sum=12300'
+          schema:
+            type: string
+      responses:
+        200:
+          description: Успешное выполнение
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PutMoney'
+        400:
+          description: Некорректные параметры запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorParameter'
+  /transferMoney:              
+    get:
+      operationId: transferMoney
+      description: >-
+        Перевести заданную сумму другому пользователю
+      tags:
+        - transferMoney
+      parameters:
+        - in: query
+          name: userid
+          description: ID Пользователя
+          required: true
+          example: 'userid=15'
+          schema:
+            type: string  
+        - in: query
+          name: sum
+          description: Сумма операции в минимальных единицах валюты
+          required: true
+          example: 'sum=12300'
+          schema:
+            type: string
+        - in: query
+          name: useridrec
+          description: ID пользователя, которому переводим деньги
+          required: true
+          example: 'useridrec=17'
+          schema:
+            type: string
+      responses:
+        200:
+          description: Успешное выполнение
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferMoney'
+        400:
+          description: Некорректные параметры запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorParameter'
+  /getOperationList:              
+    get:
+      operationId: getOperationList
+      description: >-
+        Перевести заданную сумму другому пользователю
+      tags:
+        - getOperationList
+      parameters:
+        - in: query
+          name: userid
+          description: ID Пользователя
+          required: true
+          example: 'userid=15'
+          schema:
+            type: string  
+        - in: query
+          name: startdate
+          description: Начало диапазона дат (параметр может быть пустым)
+          required: false
+          example: '21-03-2024'
+          schema:
+            type: string
+        - in: query
+          name: finishdate
+          description: Конец диапазона дат (параметр может быть пустым)
+          required: false
+          example: '23-03-2024'
+          schema:
+            type: string
+      responses:
+        200:
+          description: Успешное выполнение
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationList'
+        400:
+          description: Некорректные параметры запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorParameter'
+components:
+  schemas:
+    Balance:
+      title: Запрос Баланса
+      type: object
+      properties:
+        Balance:
+          type: array
+          items: 
+              $ref: '#/components/schemas/AccountItem'          
+    AccountItem:
+      title: Результат запроса баланса
+      type: object
+      properties:
+        Value:
+          type: string
+          example: 1234.56
+        Comment:
+          type: string
+          example: ""
+    ErrorParameter:
+      title: Ошибка в параметрах запроса
+      type: string
+    TakeMoney:
+      title: Снятие средств
+      type: object
+      properties:
+        TakeMoney:
+          type: array
+          items: 
+              $ref: '#/components/schemas/StatusItem'  
+    PutMoney:
+      title: Пополнение средств
+      type: object
+      properties:
+        PutMoney:
+          type: array
+          items: 
+              $ref: '#/components/schemas/StatusItem'  
+    StatusItem:
+      title: Статус операции
+      type: object
+      properties:
+        Value:
+          type: string
+          example: 1
+        Comment:
+          type: string
+          example: "" 
+    TransferMoney:
+      title: Перевод средств
+      type: object
+      properties:
+        PutMoney:
+          type: array
+          items: 
+              $ref: '#/components/schemas/StatusItem'
+    OperationList:
+      title: Список операций
+      type: object
+      properties:
+        OperationList:
+          type: array
+          items: 
+              $ref: '#/components/schemas/OperationItem'
+    OperationItem:
+      title: Элемент списка операций
+      type: object
+      properties:
+        DateOperation:
+          type: string
+          example: 21-03-2024
+        TypeOperation:
+          type: string
+          example: PutMoney
+        SumOperation:
+          type: string
+          example: 1234.78
+          
